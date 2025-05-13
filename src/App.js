@@ -30,7 +30,7 @@ import CheckOffer from "./Components/Body/CheckOffer";
 
 function App() {
   return (
-    <Routes basename="/home_repair_client">
+    <Routes>
       <Route path="/admin/*">
       <Route index element={<DashBoard/>} />
       <Route path="duyuru" element={<AnnouncementsPage />} />

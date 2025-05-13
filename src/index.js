@@ -12,7 +12,7 @@ axios.defaults.withCredentials = true;
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
+  <BrowserRouter basename="/home_repair_client">
     <AuthProvider>
       <NavProvider>
       <Layout>
