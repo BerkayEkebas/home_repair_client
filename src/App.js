@@ -43,6 +43,7 @@ function App() {
       </Route>
       <Route>
       <Route path="/" element={<HomePage />} />
+      <Route path="/home_repair_client" element={<HomePage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/create-request" element={<CreateRequest />} />
       <Route path="/my-requests" element={<MyRequests />} />
