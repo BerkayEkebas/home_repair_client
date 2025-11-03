@@ -1,6 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function NotFoundPage() {
+    const navigate = useNavigate();
+    const userId = localStorage.getItem("user_id");
+  
+    useEffect(() => {
+      // userId yoksa veya boşsa login sayfasına yönlendir
+      if (!userId) {
+        
+        navigate('/auth');
+        return;
+      }
+    }, [userId, navigate]);
   return (
     <div className="container-fluid py-5">
   <div className="container py-5 text-center">

@@ -21,7 +21,6 @@ import Register from "./Components/Auth/Register";
 import CreateRequest from "./Components/Body/CreateRequest";
 import MyRequests from "./Components/Body/MyRequests";
 import ExpertRequests from "./Components/Body/ExpertRequest";
-import RepairRequestForm from "./Components/Body/RepairRequestForm";
 import OfferPage from "./Components/Body/OfferPage";
 import MyPageExpert from "./Components/Body/MyPageExpert";
 import ExpertDetails from "./Components/Body/ExpertDetails";
@@ -48,7 +47,6 @@ function App() {
       <Route path="/create-request" element={<CreateRequest />} />
       <Route path="/my-requests" element={<MyRequests />} />
       <Route path="/find-requests" element={<ExpertRequests />} />
-      <Route path="/repair-request" element={<RepairRequestForm />} />
       <Route path="/offer/:id" element={<OfferPage />} />
       <Route path="/check-offer/:request_id" element={<CheckOffer />} />
       <Route path="/my-expert-page" element={<MyPageExpert />} />

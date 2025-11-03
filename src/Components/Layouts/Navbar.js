@@ -19,7 +19,6 @@ const Header = () => {
 
     try {
       await logout(); // AuthContext'teki login fonksiyonunu çağırıyoruz
-      navigate("/"); // Başarılı giriş sonrası yönlendirme
     } catch (err) {
       console.log(err);
     }
@@ -73,25 +72,12 @@ const Header = () => {
 
       <div
         className="mobile-navbar"
-        style={{ backgroundColor: "#34a346", padding: "10px 15px" }}
+        style={{ backgroundColor: "#a2aabd", padding: "10px 15px" }}
       >
         <div
           className="d-flex align-items-center justify-content-between"
           style={{ height: "50px" }}
         >
-          <div
-            className="deneme d-flex align-items-center"
-            style={{ cursor: "pointer", color: "white", marginLeft: "1px" }}
-          >
-            <Button
-                variant="contained"
-                style={{backgroundColor:"white", marginRight: "-80px", color:"green" }}
-                component={Link}
-                to="/repair-request"
-              >
-                수리 문의
-              </Button>
-          </div>
 
           {/* Logo */}
           <div
@@ -100,11 +86,11 @@ const Header = () => {
               backgroundColor: "transparent",
               padding: "70px 70px",
               borderRadius: "5px",
-              marginLeft: "16%",
+              marginLeft: "1%",
             }}
           >
             <img
-              src="https://cdn.imweb.me/thumbnail/20241114/974b51e91d3aa.png"
+              src={`${process.env.PUBLIC_URL}/logo.png`}
               alt="Logo"
               style={{
                 maxHeight: "50px",
@@ -118,7 +104,7 @@ const Header = () => {
             style={{ cursor: "pointer", color: "white", marginRight: "30px" }}
           >{userRole ?               <Button
             variant="contained"
-            style={{backgroundColor:"green", marginRight: "10px" }}
+            style={{backgroundColor:"red", marginRight: "10px" }}
             component={Link}
             to="/auth"
             onClick={handleLogout}
@@ -127,20 +113,20 @@ const Header = () => {
           </Button> :             <div style={{ display: "flex" }}>
               <Button
                 variant="contained"
-                style={{backgroundColor:"green", marginRight: "10px" }}
+                style={{backgroundColor:"#5399e1", marginRight: "10px" }}
                 component={Link}
                 to="/auth"
               >
                 로그인
               </Button>
-              <Button
+              {/* <Button
                 variant="contained"
                 style={{backgroundColor:"green"}}
                 component={Link}
                 to="/register"
               >
                 회원가입
-              </Button>
+              </Button> */}
             </div> }
 
           </div>
@@ -150,12 +136,12 @@ const Header = () => {
       {/* Navbar */}
       <header className="header">
         <div className="container">
-          {userRole === "customer" ? (
+          {userRole === "student" ? (
             <CustomerNavbar />
-          ) : userRole === "expert" ? (
+          ) : userRole === "admin" ? (
             <ExpertNavbar />
           ) : (
-            <NewNavbar />
+            ""
           )}
         </div>
       </header>

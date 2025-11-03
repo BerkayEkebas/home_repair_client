@@ -50,23 +50,6 @@ const CustomerNavbar = () => {
             홈
             </Link>
           </li>
-
-
-          <li className="nav-item">
-            <Link className="nav-link color-green-hover" to="/bakanliklar">
-              DIY
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link color-green-hover" to="/kurumlar">
-              전문가 소개
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link color-green-hover" to="/auth">
-              Ask for Help
-            </Link>
-          </li>
           <li className="nav-item">
             <button
               className="nav-link color-green-hover d-flex align-items-center"
@@ -98,16 +81,6 @@ const CustomerNavbar = () => {
                 onMouseLeave: handleMenuClose,
               }}
             >
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/create-request" className="dropdown-item">
-                수리 요청
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/my-requests" className="dropdown-item">
-                 나의 요청
-                </Link>
-              </MenuItem>
               <MenuItem onClick={handleMenuClose}>
                 <Link to="/" className="dropdown-item">
                   내 정보

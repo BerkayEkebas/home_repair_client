@@ -26,9 +26,9 @@ export function AuthProvider({ children }) {
       setUser(user); // State'i güncelle
 
       // Kullanıcının rolüne göre yönlendirme yap
-      if (user.role === 'customer') {
+      if (user.role === 'student') {
         navigate('/');
-      } else if (user.role === 'expert') {
+      } else if (user.role === 'admin') {
         navigate('/');
       } else {
         navigate('/'); // Geçerli rol yoksa ana sayfaya yönlendir
@@ -47,6 +47,7 @@ export function AuthProvider({ children }) {
       // localStorage temizle
       localStorage.removeItem('role');
       localStorage.removeItem('user');
+      localStorage.removeItem('user_id');
 
       setUser(null); // State sıfırla
 

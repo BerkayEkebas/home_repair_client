@@ -5,8 +5,7 @@ function Footer() {
     <footer
       className="footer"
       style={{
-        backgroundImage:
-          "url('https://cdn.imweb.me/thumbnail/20241008/dc19dc0d01c83.png')",
+        backgroundColor:"#0B1120",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}
@@ -25,19 +24,19 @@ function Footer() {
                 </a>
 
                 <p style={{color:"black"}}>
-                Contact us Test
+                Smart System
                 </p>
-                <a
+                {/* <a
                   href="https://www.linkedin.com/company/duyurular-org/"
                   data-toggle="tooltip"
                   data-placement="bottom"
                   title="LinkedIn"
                 >
                   <i className="fa fa-linkedin" />
-                </a>
+                </a> */}
                 <hr className="invis" />
                 <div className="newsletter-widget text-center">
-                  Çok yakında abonelik sistemi sizlerle ....
+                  Dormitory System
                   {/* <SubscriptionCard/> */}
                 </div>
                 {/* end newsletter */}
@@ -53,9 +52,6 @@ function Footer() {
           <div className="col-md-12 text-center">
             <br />
             <br />
-            <div className="copyright">
-              © Duyurular.org : Hakkı Saklıdır 2024.
-            </div>
           </div>
         </div>
       </div>

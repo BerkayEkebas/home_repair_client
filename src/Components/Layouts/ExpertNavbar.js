@@ -53,16 +53,6 @@ const ExpertNavbar = () => {
             </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link color-green-hover" to="/find-requests">
-              내 예약
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link color-green-hover" to="/find-requests">
-             문의 전체조회
-            </Link>
-          </li>
-          <li className="nav-item">
             <button
               className="nav-link color-green-hover d-flex align-items-center"
               onClick={handleMenuToggle}
