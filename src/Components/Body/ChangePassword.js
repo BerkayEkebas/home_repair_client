@@ -81,7 +81,7 @@ const ChangePassword = () => {
     setMessage('');
 
     try {
-      const response = await axios.put('http://localhost:8800/api/users/change-password', {
+      const response = await axios.put('https://home-repair-api.onrender.com/api/users/change-password', {
         userId: userId, // userId'yi doğrudan kullan
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword

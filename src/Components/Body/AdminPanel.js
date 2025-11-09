@@ -90,7 +90,7 @@ const AdminPanel = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:8800/api/users/users');
+            const response = await axios.get('https://home-repair-api.onrender.com/api/users/users');
             setUsers(response.data);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -117,7 +117,7 @@ const AdminPanel = () => {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8800/api/users/users/${editingUser.user_id}`, {
+            const response = await axios.put(`https://home-repair-api.onrender.com/api/users/users/${editingUser.user_id}`, {
                 name: editingUser.name,
                 email: editingUser.email,
                 role: editingUser.role,
@@ -138,7 +138,7 @@ const AdminPanel = () => {
         if (!window.confirm(t.confirmDelete)) return;
 
         try {
-            const response = await axios.delete(`http://localhost:8800/api/users/users/${userId}`);
+            const response = await axios.delete(`https://home-repair-api.onrender.com/api/users/users/${userId}`);
             setMessage(response.data[language] || response.data.en);
             fetchUsers();
         } catch (error) {
@@ -154,7 +154,7 @@ const AdminPanel = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8800/api/users/users', newUser);
+            const response = await axios.post('https://home-repair-api.onrender.com/api/users/users', newUser);
             setMessage(response.data.message[language] || response.data.message.en);
             setShowCreateForm(false);
             setNewUser({ name: '', email: '', password: '', role: 'student', room_id: '' });
