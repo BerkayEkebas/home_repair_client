@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/home_repair_client/static/css/main.2458d133.css",
-    "main.js": "/home_repair_client/static/js/main.bf3dfa20.js",
+    "main.css": "/home_repair_client/static/css/main.d2fe6404.css",
+    "main.js": "/home_repair_client/static/js/main.726353b7.js",
     "static/js/453.6f2a403b.chunk.js": "/home_repair_client/static/js/453.6f2a403b.chunk.js",
     "static/media/slick.svg": "/home_repair_client/static/media/slick.2630a3e3eab21c607e21.svg",
     "static/media/slick.eot": "/home_repair_client/static/media/slick.a4e97f5a2a64f0ab1323.eot",
     "static/media/slick.ttf": "/home_repair_client/static/media/slick.c94f7671dcc99dce43e2.ttf",
     "index.html": "/home_repair_client/index.html",
     "static/media/slick.woff": "/home_repair_client/static/media/slick.295183786cd8a1389865.woff",
-    "main.2458d133.css.map": "/home_repair_client/static/css/main.2458d133.css.map",
-    "main.bf3dfa20.js.map": "/home_repair_client/static/js/main.bf3dfa20.js.map",
+    "main.d2fe6404.css.map": "/home_repair_client/static/css/main.d2fe6404.css.map",
+    "main.726353b7.js.map": "/home_repair_client/static/js/main.726353b7.js.map",
     "453.6f2a403b.chunk.js.map": "/home_repair_client/static/js/453.6f2a403b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2458d133.css",
-    "static/js/main.bf3dfa20.js"
+    "static/css/main.d2fe6404.css",
+    "static/js/main.726353b7.js"
   ]
 }
