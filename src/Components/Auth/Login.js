@@ -9,14 +9,21 @@ import {
   Container,
   InputAdornment,
   Alert,
-  Fade
+  Fade,
+  IconButton,
+  Menu,
+  MenuItem,
+  AppBar,
+  Toolbar
 } from '@mui/material';
 import {
   Email,
   Lock,
   Person,
   Visibility,
-  VisibilityOff
+  VisibilityOff,
+  Language,
+  School
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Context/authContext';
@@ -28,7 +35,39 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [language, setLanguage] = useState('korean'); // 'korean', 'english'
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+
+  // Dil çevirileri
+  const translations = {
+    korean: {
+      title: '스마트 기숙사 관리 시스템',
+      loginTitle: '로그인',
+      loginSubtitle: '계정에 로그인하여 서비스를 이용하세요',
+      email: '이메일 주소',
+      password: '비밀번호',
+      loginButton: '로그인',
+      loginError: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
+      copyright: '© 2024 모든 권리 보유',
+      korean: '한국어',
+      english: 'English'
+    },
+    english: {
+      title: 'Smart Dorm Management System',
+      loginTitle: 'Login',
+      loginSubtitle: 'Sign in to your account to access the service',
+      email: 'Email Address',
+      password: 'Password',
+      loginButton: 'Login',
+      loginError: 'Login failed. Please check your email and password.',
+      copyright: '© 2024 All rights reserved',
+      korean: 'Korean',
+      english: 'English'
+    }
+  };
+
+  const t = translations[language];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,12 +79,25 @@ const Login = () => {
       navigate('/');
     } catch (err) {
       setLoading(false);
-      setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      setError(t.loginError);
     }
   };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleLanguageClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLanguageClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    handleLanguageClose();
   };
 
   return (
@@ -74,6 +126,58 @@ const Login = () => {
         }
       }}
     >
+      {/* Language Selector App Bar */}
+      <AppBar 
+        position="absolute" 
+        sx={{ 
+          backgroundColor: 'transparent', 
+          boxShadow: 'none',
+          top: 16,
+          right: 16
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'flex-end', minHeight: 'auto!important' }}>
+          <IconButton
+            onClick={handleLanguageClick}
+            sx={{
+              color: 'white',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              }
+            }}
+          >
+            <Language />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleLanguageClose}
+            sx={{
+              '& .MuiPaper-root': {
+                borderRadius: 2,
+                marginTop: 1,
+                minWidth: 120,
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={() => handleLanguageChange('korean')}
+              selected={language === 'korean'}
+            >
+              {t.korean}
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleLanguageChange('english')}
+              selected={language === 'english'}
+            >
+              {t.english}
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+
       <Container component="main" maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
         <Fade in timeout={800}>
           <Paper
@@ -107,10 +211,12 @@ const Login = () => {
                   boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)',
                 }}
               >
-                <Person sx={{ fontSize: 40, color: 'white' }} />
+                <School sx={{ fontSize: 40, color: 'white' }} />
               </Box>
+              
+              {/* System Title */}
               <Typography
-                variant="h3"
+                variant="h4"
                 component="h1"
                 sx={{
                   fontWeight: 'bold',
@@ -118,11 +224,30 @@ const Login = () => {
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   color: 'transparent',
-                  mb: 1,
+                  mb: 2,
+                  fontSize: { xs: '1.5rem', md: '2rem' },
                 }}
               >
-                로그인
+                {t.title}
               </Typography>
+
+              {/* Login Title */}
+              <Typography
+                variant="h3"
+                component="h2"
+                sx={{
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  mb: 1,
+                  fontSize: { xs: '1.75rem', md: '2.5rem' },
+                }}
+              >
+                {t.loginTitle}
+              </Typography>
+              
               <Typography
                 variant="body1"
                 sx={{
@@ -130,7 +255,7 @@ const Login = () => {
                   fontSize: '1.1rem',
                 }}
               >
-                계정에 로그인하여 서비스를 이용하세요
+                {t.loginSubtitle}
               </Typography>
             </Box>
 
@@ -138,7 +263,7 @@ const Login = () => {
               <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth
-                  label="이메일 주소"
+                  label={t.email}
                   variant="outlined"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -173,7 +298,7 @@ const Login = () => {
               <Box sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
-                  label="비밀번호"
+                  label={t.password}
                   type={showPassword ? 'text' : 'password'}
                   variant="outlined"
                   value={password}
@@ -268,7 +393,7 @@ const Login = () => {
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
                 ) : (
-                  '로그인'
+                  t.loginButton
                 )}
               </Button>
             </form>
@@ -290,7 +415,7 @@ const Login = () => {
                   opacity: 0.7,
                 }}
               >
-                © 2024 All rights reserved
+                {t.copyright}
               </Typography>
             </Box>
           </Paper>

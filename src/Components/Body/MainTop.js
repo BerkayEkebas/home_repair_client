@@ -15,21 +15,29 @@ import {
   Stack,
   Paper,
   Tab,
-  Tabs
+  Tabs,
+  IconButton,
+  Menu,
+  MenuItem,
+  AppBar,
+  Toolbar
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { 
-  Logout, 
-  Refresh, 
-  Power, 
-  AcUnit, 
-  Window, 
+import {
+  Logout,
+  Refresh,
+  Power,
+  AcUnit,
+  Window,
   Schedule,
   LocationOn,
   People,
   Home,
-  Numbers
+  Numbers,
+  WarningAmber,
+  Language
 } from "@mui/icons-material";
+import AiDangerStatus from "../AiDangerStatus";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(255, 255, 255, 0.1)",
@@ -126,6 +134,94 @@ const MainTop = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tabValue, setTabValue] = useState(0);
+  const [language, setLanguage] = useState('korean'); // 'korean', 'english'
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  // Dil çevirileri
+  const translations = {
+    korean: {
+      title: '기숙사 환경 상태',
+      environmentStatus: '환경 상태',
+      roomInfo: '방 정보',
+      occupantInfo: '거주자 정보',
+      loading: '데이터 로딩 중...',
+      error: '데이터를 가져올 수 없습니다',
+      retry: '다시 시도',
+      logout: '로그아웃',
+      smartOutlet: '스마트 콘센트',
+      powerUsage: '전력 사용량:',
+      windowAc: '창문 열림 / 에어컨 켜짐',
+      temperature: '온도:',
+      ac: '에어컨:',
+      humidity: '습도:',
+      window: '창문:',
+      roomVacancy: '빈 방 (30분 제한)',
+      detect: '감지',
+      timeLeft: '남은 시간',
+      power: '전력',
+      buildingName: '건물 이름',
+      location: '위치 정보',
+      roomInfoDetail: '방 정보',
+      roomNumber: '방 번호',
+      capacity: '정원',
+      currentOccupants: '현재 거주 인원',
+      lastUpdate: '마지막 업데이트',
+      totalOccupants: '총 거주자 수',
+      currentStudents: '현재 거주 중인 학생들:',
+      noStudents: '현재 이 방에 거주 중인 학생이 없습니다.',
+      noData: '표시할 방 데이터가 없습니다.',
+      floor: '층',
+      people: '명',
+      on: 'ON',
+      off: 'OFF',
+      open: 'OPEN',
+      closed: 'CLOSED',
+      korean: '한국어',
+      english: 'English'
+    },
+    english: {
+      title: 'Dorm Environment Status',
+      environmentStatus: 'Environment Status',
+      roomInfo: 'Room Information',
+      occupantInfo: 'Occupant Information',
+      loading: 'Loading data...',
+      error: 'Failed to fetch data',
+      retry: 'Try Again',
+      logout: 'Logout',
+      smartOutlet: 'Smart Outlet',
+      powerUsage: 'Power Usage:',
+      windowAc: 'Windows Open / AC On',
+      temperature: 'Temperature:',
+      ac: 'AC:',
+      humidity: 'Humidity:',
+      window: 'Window:',
+      roomVacancy: 'Room Vacant (30Min limit)',
+      detect: 'Detect',
+      timeLeft: 'Time Left',
+      power: 'Power',
+      buildingName: 'Building Name',
+      location: 'Location',
+      roomInfoDetail: 'Room Information',
+      roomNumber: 'Room Number',
+      capacity: 'Capacity',
+      currentOccupants: 'Current Occupants',
+      lastUpdate: 'Last Updated',
+      totalOccupants: 'Total Occupants',
+      currentStudents: 'Currently residing students:',
+      noStudents: 'No students currently residing in this room.',
+      noData: 'No room data to display.',
+      floor: 'Floor',
+      people: 'people',
+      on: 'ON',
+      off: 'OFF',
+      open: 'OPEN',
+      closed: 'CLOSED',
+      korean: 'Korean',
+      english: 'English'
+    }
+  };
+
+  const t = translations[language];
 
   useEffect(() => {
     const user = localStorage.getItem("user_id");
@@ -141,9 +237,12 @@ const MainTop = () => {
       setLoading(true);
       setError(null);
       const userId = localStorage.getItem("user_id");
-      
+
       if (!userId) {
-        setError("사용자 ID를 찾을 수 없습니다 (localStorage 비어있음)");
+        setError(language === 'korean' 
+          ? "사용자 ID를 찾을 수 없습니다 (localStorage 비어있음)"
+          : "User ID not found (localStorage empty)"
+        );
         setLoading(false);
         return;
       }
@@ -158,14 +257,14 @@ const MainTop = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP 오류! 상태: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       setRoomData(Array.isArray(data) ? data : [data]);
     } catch (err) {
-      console.error("Fetch 오류:", err);
-      setError(err.message || "데이터를 가져올 수 없습니다");
+      console.error("Fetch error:", err);
+      setError(err.message || t.error);
     } finally {
       setLoading(false);
     }
@@ -179,6 +278,19 @@ const MainTop = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("user_id");
     navigate("/login");
+  };
+
+  const handleLanguageClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLanguageClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    handleLanguageClose();
   };
 
   if (loading) {
@@ -195,7 +307,7 @@ const MainTop = () => {
         }}
       >
         <CircularProgress sx={{ color: "#00BFFF", mb: 2 }} />
-        <Typography variant="h6">데이터 로딩 중...</Typography>
+        <Typography variant="h6">{t.loading}</Typography>
       </Box>
     );
   }
@@ -225,7 +337,7 @@ const MainTop = () => {
             mb: 2,
           }}
         >
-          다시 시도
+          {t.retry}
         </Button>
         <Button
           variant="contained"
@@ -236,7 +348,7 @@ const MainTop = () => {
             "&:hover": { backgroundColor: "#dc2626" },
           }}
         >
-          로그아웃
+          {t.logout}
         </Button>
       </Container>
     );
@@ -244,34 +356,73 @@ const MainTop = () => {
 
   return (
     <Box sx={{ backgroundColor: "#0B1120", minHeight: "100vh", py: 4 }}>
+      {/* Language Selector App Bar */}
+      <AppBar 
+        position="absolute" 
+        sx={{ 
+          backgroundColor: 'transparent', 
+          boxShadow: 'none',
+          top: 200,
+          right: 16
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'flex-end', minHeight: 'auto!important' }}>
+          <IconButton
+            onClick={handleLanguageClick}
+            sx={{
+              color: 'white',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              }
+            }}
+          >
+            <Language />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleLanguageClose}
+            sx={{
+              '& .MuiPaper-root': {
+                borderRadius: 2,
+                marginTop: 1,
+                minWidth: 120,
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={() => handleLanguageChange('korean')}
+              selected={language === 'korean'}
+            >
+              {t.korean}
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleLanguageChange('english')}
+              selected={language === 'english'}
+            >
+              {t.english}
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+
       <Container maxWidth="lg">
         {/* Header */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              color: "white", 
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              color: "white",
               fontWeight: "bold",
               textAlign: "center",
               flex: 1
             }}
           >
-            기숙사 환경 상태
+            {t.title}
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<Logout />}
-            onClick={handleLogout}
-            sx={{
-              backgroundColor: "#ef4444",
-              "&:hover": { backgroundColor: "#dc2626" },
-              borderRadius: 20,
-              px: 3,
-            }}
-          >
-            로그아웃
-          </Button>
         </Box>
 
         {/* Room Cards */}
@@ -282,34 +433,41 @@ const MainTop = () => {
                 <CardContent>
                   {/* Tab Navigation */}
                   <StyledTabs value={tabValue} onChange={handleTabChange} centered>
-                    <Tab label="환경 상태" />
-                    <Tab label="방 정보" />
-                    <Tab label="거주자 정보" />
+                    <Tab label={t.environmentStatus} />
+                    <Tab label={t.roomInfo} />
+                    <Tab label={t.occupantInfo} />
                   </StyledTabs>
 
                   {/* Tab 1: Environment Status */}
                   {tabValue === 0 && (
                     <Box>
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                        <Typography sx={{ mr: 1 }}>AI 🤖</Typography>
+                        <AiDangerStatus danger_status_ai={room.danger_status_ai} />
+                      </Box>
                       {/* Smart Outlet Section */}
                       <Box sx={{ mb: 3 }}>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                           <Power sx={{ mr: 1, color: "#fff" }} />
                           <Typography variant="h6" component="h2" sx={{ color: "white", fontWeight: "bold" }}>
-                            Smart outlet
+                            {t.smartOutlet}
                           </Typography>
                         </Box>
-                        <Chip 
-                          label="(MAX 3KW)" 
-                          size="small" 
-                          sx={{ 
-                            backgroundColor: "rgba(255,255,255,0.1)", 
+                        <Chip
+                          label="(MAX 3KW)"
+                          size="small"
+                          sx={{
+                            backgroundColor: "rgba(255,255,255,0.1)",
                             color: "#9ca3af",
                             mb: 2
-                          }} 
+                          }}
                         />
-                        <PowerUsageBox>
+                        <PowerUsageBox sx={room.danger_status_ai === 1 ? {backgroundColor:"red"} : "" }>
+                          
                           <Typography variant="body1" sx={{ color: "#9ca3af" }}>
-                            Power Usage:
+                            {room.danger_status_ai === 1 && 
+                          <WarningAmber/>}
+                            {t.powerUsage}
                           </Typography>
                           <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
                             {room.power_consumption || 0}W
@@ -324,15 +482,15 @@ const MainTop = () => {
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                           <AcUnit sx={{ mr: 1, color: "#fff" }} />
                           <Typography variant="h6" component="h2" sx={{ color: "white", fontWeight: "bold" }}>
-                            Windows open AC On
+                            {t.windowAc}
                           </Typography>
                         </Box>
-                        
+
                         <Grid container spacing={1}>
                           <Grid item xs={6}>
-                            <StatusItem>
+                            <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                                온도:
+                                {t.temperature}
                               </Typography>
                               <Typography variant="body2" sx={{ color: "white", fontWeight: "bold" }}>
                                 {room.temperature || "N/A"}°C
@@ -340,12 +498,12 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem>
+                            <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                                AC:
+                                {t.ac}
                               </Typography>
                               <Chip
-                                label={room.ac_status || "OFF"}
+                                label={room.ac_status === "ON" ? t.on : t.off}
                                 size="small"
                                 sx={{
                                   backgroundColor: room.ac_status === "ON" ? "#22c55e" : "#ef4444",
@@ -356,9 +514,9 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem>
+                            <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                                습도:
+                                {t.humidity}
                               </Typography>
                               <Typography variant="body2" sx={{ color: "white", fontWeight: "bold" }}>
                                 {room.humidity || "N/A"}%
@@ -366,14 +524,14 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem>
+                            <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                                WD:
+                                {t.window}
                               </Typography>
                               <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <Window sx={{ fontSize: 16, mr: 0.5, color: "#fff" }} />
                                 <Typography variant="body2" sx={{ color: "white", fontWeight: "bold" }}>
-                                  {room.window_status || "CLOSED"}
+                                  {room.window_status === "OPEN" ? t.open : t.closed}
                                 </Typography>
                               </Box>
                             </StatusItem>
@@ -388,20 +546,20 @@ const MainTop = () => {
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                           <Schedule sx={{ mr: 1, color: "#fff" }} />
                           <Typography variant="h6" component="h2" sx={{ color: "white", fontWeight: "bold" }}>
-                            Room Vacant (30Min limit)
+                            {t.roomVacancy}
                           </Typography>
                         </Box>
-                        
-                        <VacancyTable>
+
+                        <VacancyTable sx={room.danger_status_ai === 4 ? {backgroundColor:"red"} : "" }>
                           <TableHeader>
-                            <TableCell>Detect</TableCell>
-                            <TableCell>left</TableCell>
-                            <TableCell>Power</TableCell>
+                            <TableCell>{t.detect}</TableCell>
+                            <TableCell>{t.timeLeft}</TableCell>
+                            <TableCell>{t.power}</TableCell>
                           </TableHeader>
                           <TableRow>
                             <TableCell>12:10</TableCell>
                             <TableCell>20</TableCell>
-                            <TableCell sx={{ color: "#22c55e" }}>ON</TableCell>
+                            <TableCell sx={{ color: "#22c55e" }}>{t.on}</TableCell>
                           </TableRow>
                         </VacancyTable>
                       </Box>
@@ -412,16 +570,16 @@ const MainTop = () => {
                   {tabValue === 1 && (
                     <Box>
                       <Typography variant="h6" sx={{ color: "white", fontWeight: "bold", mb: 3, textAlign: "center" }}>
-                        방 기본 정보
+                        {t.roomInfoDetail}
                       </Typography>
-                      
+
                       <Stack spacing={2}>
                         <InfoItem>
                           <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
                             <Home sx={{ mr: 2, color: "#00BFFF" }} />
                             <Box>
                               <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                건물 이름
+                                {t.buildingName}
                               </Typography>
                               <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
                                 {room.building_name || "N/A"}
@@ -435,10 +593,10 @@ const MainTop = () => {
                             <LocationOn sx={{ mr: 2, color: "#22c55e" }} />
                             <Box>
                               <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                위치 정보
+                                {t.location}
                               </Typography>
                               <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
-                                {room.floor_number ? `${room.floor_number}층` : "N/A"} • {room.room_number || "N/A"}호
+                                {room.floor_number ? `${room.floor_number}${language === 'korean' ? '층' : ` ${t.floor}`}` : "N/A"} • {room.room_number || "N/A"}{language === 'korean' ? '호' : ''}
                               </Typography>
                             </Box>
                           </Box>
@@ -449,10 +607,10 @@ const MainTop = () => {
                             <Numbers sx={{ mr: 2, color: "#eab308" }} />
                             <Box>
                               <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                방 정보
+                                {t.roomInfoDetail}
                               </Typography>
                               <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
-                                방 번호: {room.room_number || "N/A"} • 정원: {room.room_capacity || "N/A"}명
+                                {t.roomNumber}: {room.room_number || "N/A"} • {t.capacity}: {room.room_capacity || "N/A"}{language === 'korean' ? '명' : ` ${t.people}`}
                               </Typography>
                             </Box>
                           </Box>
@@ -463,10 +621,10 @@ const MainTop = () => {
                             <People sx={{ mr: 2, color: "#8b5cf6" }} />
                             <Box>
                               <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                현재 거주 인원
+                                {t.currentOccupants}
                               </Typography>
                               <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
-                                {room.occupant_count || 0} / {room.room_capacity || "N/A"} 명
+                                {room.occupant_count || 0} / {room.room_capacity || "N/A"} {language === 'korean' ? '명' : t.people}
                               </Typography>
                             </Box>
                           </Box>
@@ -477,10 +635,10 @@ const MainTop = () => {
                             <Schedule sx={{ mr: 2, color: "#f97316" }} />
                             <Box>
                               <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                마지막 업데이트
+                                {t.lastUpdate}
                               </Typography>
                               <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
-                                {room.last_updated ? new Date(room.last_updated).toLocaleString('ko-KR') : "Unknown"}
+                                {room.last_updated ? new Date(room.last_updated).toLocaleString(language === 'korean' ? 'ko-KR' : 'en-US') : "Unknown"}
                               </Typography>
                             </Box>
                           </Box>
@@ -493,9 +651,9 @@ const MainTop = () => {
                   {tabValue === 2 && (
                     <Box>
                       <Typography variant="h6" sx={{ color: "white", fontWeight: "bold", mb: 3, textAlign: "center" }}>
-                        거주자 정보
+                        {t.occupantInfo}
                       </Typography>
-                      
+
                       {room.occupants ? (
                         <Box>
                           <InfoItem sx={{ mb: 2 }}>
@@ -503,19 +661,19 @@ const MainTop = () => {
                               <People sx={{ mr: 2, color: "#8b5cf6" }} />
                               <Box>
                                 <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                                  총 거주자 수
+                                  {t.totalOccupants}
                                 </Typography>
                                 <Typography variant="body1" sx={{ color: "white", fontWeight: "bold" }}>
-                                  {room.occupant_count || 0}명
+                                  {room.occupant_count || 0}{language === 'korean' ? '명' : ` ${t.people}`}
                                 </Typography>
                               </Box>
                             </Box>
                           </InfoItem>
 
                           <Typography variant="body1" sx={{ color: "#9ca3af", mb: 2, textAlign: "center" }}>
-                            현재 거주 중인 학생들:
+                            {t.currentStudents}
                           </Typography>
-                          
+
                           <Box sx={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderRadius: 2, p: 2 }}>
                             {room.occupants.split(',').map((occupant, idx) => (
                               <Chip
@@ -535,7 +693,7 @@ const MainTop = () => {
                         <Box sx={{ textAlign: "center", py: 4 }}>
                           <People sx={{ fontSize: 48, color: "#6b7280", mb: 2 }} />
                           <Typography variant="body1" sx={{ color: "#9ca3af" }}>
-                            현재 이 방에 거주 중인 학생이 없습니다.
+                            {t.noStudents}
                           </Typography>
                         </Box>
                       )}
@@ -543,17 +701,17 @@ const MainTop = () => {
                   )}
 
                   {/* Last Updated - All Tabs */}
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      color: "#9ca3af", 
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#9ca3af",
                       textAlign: "center",
                       display: "block",
                       mt: 3,
                       fontStyle: "italic"
                     }}
                   >
-                    Last updated: {room.last_updated ? new Date(room.last_updated).toLocaleString('en-US') : "Unknown"}
+                    {t.lastUpdate}: {room.last_updated ? new Date(room.last_updated).toLocaleString(language === 'korean' ? 'ko-KR' : 'en-US') : "Unknown"}
                   </Typography>
                 </CardContent>
               </StyledCard>
@@ -564,7 +722,7 @@ const MainTop = () => {
         {roomData.length === 0 && (
           <Box sx={{ textAlign: "center", mt: 4 }}>
             <Typography variant="h6" sx={{ color: "#9ca3af" }}>
-              표시할 방 데이터가 없습니다.
+              {t.noData}
             </Typography>
           </Box>
         )}

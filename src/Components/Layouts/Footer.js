@@ -5,7 +5,7 @@ function Footer() {
     <footer
       className="footer"
       style={{
-        backgroundColor:"#0B1120",
+        backgroundColor:"#a2aabd",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}

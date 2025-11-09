@@ -39,8 +39,10 @@ import {
   Home,
   LocationOn,
   People,
-  Numbers
+  Numbers,
+  WarningAmber
 } from "@mui/icons-material";
+import AiDangerStatus from "../AiDangerStatus";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(255, 255, 255, 0.1)",
@@ -230,6 +232,10 @@ const MainAdminTop = () => {
           >
             {room.room_number}호
           </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Typography sx={{ mr: 1 }}>AI 🤖</Typography>
+            <AiDangerStatus danger_status_ai={room.danger_status_ai} />
+          </Box>
 
           <Stack spacing={1} sx={{ mb: 2 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -352,12 +358,12 @@ const MainAdminTop = () => {
         {/* Tab 1: Environment Status */}
         {tabValue === 0 && (
           <Box>
-            {/* Smart Outlet Section */}
+            {/* 스마트 콘센트 Section */}
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                 <Power sx={{ mr: 1, color: "#fff" }} />
                 <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
-                  Smart outlet
+                  스마트 콘센트
                 </Typography>
               </Box>
               <Chip
@@ -369,9 +375,11 @@ const MainAdminTop = () => {
                   mb: 2,
                 }}
               />
-              <PowerUsageBox>
+              <PowerUsageBox sx={room.danger_status_ai === 1 ? {backgroundColor:"red"} : "" }>
                 <Typography variant="body1" sx={{ color: "#9ca3af" }}>
-                  Power Usage:
+                  {room.danger_status_ai === 1 &&
+                    <WarningAmber />}
+                  전력 사용량:
                 </Typography>
                 <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
                   {room.power_consumption}W
@@ -386,13 +394,13 @@ const MainAdminTop = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <AcUnit sx={{ mr: 1, color: "#fff" }} />
                 <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
-                  Windows open AC On
+                  창문 열림 / 에어컨 켜짐
                 </Typography>
               </Box>
 
               <Grid container spacing={1}>
                 <Grid item xs={6}>
-                  <StatusItem>
+                  <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
                     <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                       온도:
                     </Typography>
@@ -402,9 +410,9 @@ const MainAdminTop = () => {
                   </StatusItem>
                 </Grid>
                 <Grid item xs={6}>
-                  <StatusItem>
+                  <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
                     <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                      AC:
+                      에어컨:
                     </Typography>
                     <Chip
                       label={room.ac_status}
@@ -418,7 +426,7 @@ const MainAdminTop = () => {
                   </StatusItem>
                 </Grid>
                 <Grid item xs={6}>
-                  <StatusItem>
+                  <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
                     <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                       습도:
                     </Typography>
@@ -428,9 +436,9 @@ const MainAdminTop = () => {
                   </StatusItem>
                 </Grid>
                 <Grid item xs={6}>
-                  <StatusItem>
+                  <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
                     <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
-                      WD:
+                      창문:
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Window sx={{ fontSize: 16, mr: 0.5, color: "#fff" }} />
@@ -450,15 +458,15 @@ const MainAdminTop = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Schedule sx={{ mr: 1, color: "#fff" }} />
                 <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
-                  Room Vacant (30Min limit)
+                  빈 방 (30분 제한)
                 </Typography>
               </Box>
 
-              <VacancyTable>
+              <VacancyTable sx={room.danger_status_ai === 4 ? {backgroundColor:"red"} : "" }>
                 <TableHeader>
-                  <TableCell>Detect</TableCell>
-                  <TableCell>left</TableCell>
-                  <TableCell>Power</TableCell>
+                  <TableCell>감지</TableCell>
+                  <TableCell>남은 시간</TableCell>
+                  <TableCell>전력</TableCell>
                 </TableHeader>
                 <TableRow>
                   <TableCell>12:10</TableCell>
@@ -476,7 +484,7 @@ const MainAdminTop = () => {
             <Typography variant="h6" sx={{ color: "white", fontWeight: "bold", mb: 3, textAlign: "center" }}>
               방 기본 정보
             </Typography>
-            
+
             <Stack spacing={2}>
               <InfoItem>
                 <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
@@ -543,7 +551,7 @@ const MainAdminTop = () => {
             <Typography variant="h6" sx={{ color: "white", fontWeight: "bold", mb: 3, textAlign: "center" }}>
               거주자 정보
             </Typography>
-            
+
             {room.occupants ? (
               <Box>
                 <InfoItem sx={{ mb: 2 }}>
@@ -563,7 +571,7 @@ const MainAdminTop = () => {
                 <Typography variant="body1" sx={{ color: "#9ca3af", mb: 2, textAlign: "center" }}>
                   현재 거주 중인 학생들:
                 </Typography>
-                
+
                 <Box sx={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderRadius: 2, p: 2 }}>
                   {room.occupants.split(',').map((occupant, idx) => (
                     <Chip
@@ -590,7 +598,7 @@ const MainAdminTop = () => {
           </Box>
         )}
 
-        {/* Last Updated - All Tabs */}
+        {/* 마지막 업데이트 - All Tabs */}
         <Typography
           variant="caption"
           sx={{
@@ -601,7 +609,7 @@ const MainAdminTop = () => {
             fontStyle: "italic",
           }}
         >
-          Last updated: {room.last_updated ? new Date(room.last_updated).toLocaleString('en-US') : "Unknown"}
+          마지막 업데이트: {room.last_updated ? new Date(room.last_updated).toLocaleString('en-US') : "Unknown"}
         </Typography>
       </DialogContent>
     </Dialog>
@@ -694,7 +702,7 @@ const MainAdminTop = () => {
               <Refresh />
             </IconButton>
           </Tooltip>
-          <Button
+          {/* <Button
             color="error"
             variant="contained"
             startIcon={<Logout />}
@@ -702,7 +710,7 @@ const MainAdminTop = () => {
             size="small"
           >
             로그아웃
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
 

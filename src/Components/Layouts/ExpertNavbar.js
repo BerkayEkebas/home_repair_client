@@ -84,13 +84,8 @@ const ExpertNavbar = () => {
               }}
             >
               <MenuItem onClick={handleMenuClose}>
-                <Link to="/find-requests" className="dropdown-item">
-                수락된 요청
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/my-expert-page" className="dropdown-item">
-                내 정보
+                <Link to="/adminpage" className="dropdown-item">
+                관리자 패널(Admin)
                 </Link>
               </MenuItem>
             </Menu>

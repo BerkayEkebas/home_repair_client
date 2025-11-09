@@ -6,6 +6,7 @@ import ExpertNavbar from "./ExpertNavbar";
 import { useAuth } from "../../Context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { Logout } from "@mui/icons-material";
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -104,8 +105,9 @@ const Header = () => {
             style={{ cursor: "pointer", color: "white", marginRight: "30px" }}
           >{userRole ?               <Button
             variant="contained"
-            style={{backgroundColor:"red", marginRight: "10px" }}
+            style={{backgroundColor:"#c13535", marginRight: "10px" }}
             component={Link}
+            startIcon={<Logout />}
             to="/auth"
             onClick={handleLogout}
           >

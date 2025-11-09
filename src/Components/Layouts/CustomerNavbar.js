@@ -82,7 +82,7 @@ const CustomerNavbar = () => {
               }}
             >
               <MenuItem onClick={handleMenuClose}>
-                <Link to="/" className="dropdown-item">
+                <Link to="/mypage" className="dropdown-item">
                   내 정보
                 </Link>
               </MenuItem>

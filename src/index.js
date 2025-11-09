@@ -6,7 +6,6 @@ import { BrowserRouter } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import { AuthProvider } from "./Context/authContext.js"; // AuthProvider'ı import et
 import axios from 'axios';
-import { NavProvider} from "./Context/navContext.js";
 
 axios.defaults.withCredentials = true;
 
@@ -14,11 +13,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter basename="/home_repair_client">
     <AuthProvider>
-      <NavProvider>
       <Layout>
         <App />
       </Layout>
-      </NavProvider>
     </AuthProvider>
   </BrowserRouter>
 );
