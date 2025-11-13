@@ -195,6 +195,23 @@ const MainAdminTop = () => {
     }
   };
 
+  const calculateTimeLeft = (lastUpdated) => {
+    if (!lastUpdated) return 0;
+    const now = new Date();
+    const updated = new Date(lastUpdated);
+    const diffMs = now - updated;
+    const diffMinutes = Math.ceil(diffMs / 1000 / 60);
+    return diffMinutes;
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("user_id");
@@ -205,6 +222,34 @@ const MainAdminTop = () => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
+
+  // Dil çevirileri (isteğe bağlı olarak ekleyebilirsiniz)
+  const translations = {
+    korean: {
+      on: "ON",
+      off: "OFF",
+      open: "OPEN", 
+      closed: "CLOSED",
+      detect: "감지",
+      timeLeft: "남은 시간",
+      power: "전력",
+      roomVacancy: "빈 방 (30분 제한)",
+      // Diğer çevirileri buraya ekleyebilirsiniz
+    },
+    english: {
+      on: "ON",
+      off: "OFF", 
+      open: "OPEN",
+      closed: "CLOSED",
+      detect: "Detect",
+      timeLeft: "Time Left",
+      power: "Power",
+      roomVacancy: "Room Vacant (30Min limit)",
+      // Diğer çevirileri buraya ekleyebilirsiniz
+    }
+  };
+
+  const t = translations.korean; // Varsayılan olarak Korece
 
   const RoomCard = ({ room }) => (
     <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -304,10 +349,10 @@ const MainAdminTop = () => {
               }}
             />
             <StatusChip
-              label={room.room_occupancy === "OCCUPIED" ? "OCCUPIED" : "VACANT"}
+              label={room.room_occupancy === 1 ? "OCCUPIED" : "VACANT"}
               size="small"
               sx={{
-                backgroundColor: room.room_occupancy === "OCCUPIED" ? "#3b82f6" : "#6b7280",
+                backgroundColor: room.room_occupancy === 1 ? "#3b82f6" : "#6b7280",
               }}
             />
           </Stack>
@@ -415,7 +460,7 @@ const MainAdminTop = () => {
                       에어컨:
                     </Typography>
                     <Chip
-                      label={room.ac_status}
+                      label={room.ac_status === "ON" ? t.on : t.off}
                       size="small"
                       sx={{
                         backgroundColor: room.ac_status === "ON" ? "#22c55e" : "#ef4444",
@@ -443,7 +488,7 @@ const MainAdminTop = () => {
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Window sx={{ fontSize: 16, mr: 0.5, color: "#fff" }} />
                       <Typography variant="body2" sx={{ color: "white", fontWeight: "bold" }}>
-                        {room.window_status}
+                        {room.window_status === "OPEN" ? t.open : t.closed}
                       </Typography>
                     </Box>
                   </StatusItem>
@@ -458,20 +503,28 @@ const MainAdminTop = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Schedule sx={{ mr: 1, color: "#fff" }} />
                 <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
-                  빈 방 (30분 제한)
+                  {t.roomVacancy}
                 </Typography>
               </Box>
 
               <VacancyTable sx={room.danger_status_ai === 4 ? {backgroundColor:"red"} : "" }>
                 <TableHeader>
-                  <TableCell>감지</TableCell>
-                  <TableCell>남은 시간</TableCell>
-                  <TableCell>전력</TableCell>
+                  <TableCell>{t.detect}</TableCell>
+                  <TableCell>{t.timeLeft}</TableCell>
+                  <TableCell>{t.power}</TableCell>
                 </TableHeader>
                 <TableRow>
-                  <TableCell>12:10</TableCell>
-                  <TableCell>20</TableCell>
-                  <TableCell sx={{ color: "#22c55e" }}>ON</TableCell>
+                  <TableCell>
+                    {formatTime(room.last_updated)}
+                  </TableCell>
+                  <TableCell>
+                    {room.room_occupancy === 0
+                      ? "0" // Room boşsa sabit değer
+                      : calculateTimeLeft(room.last_updated)} {/* Room doluysa last_updated'e göre */}
+                  </TableCell>
+                  <TableCell sx={{ color: calculateTimeLeft(room.last_updated) > 0 ? "#22c55e" : "gray" }}>
+                    {calculateTimeLeft(room.last_updated) > 0 ? t.on : t.off}
+                  </TableCell>
                 </TableRow>
               </VacancyTable>
             </Box>
@@ -702,15 +755,6 @@ const MainAdminTop = () => {
               <Refresh />
             </IconButton>
           </Tooltip>
-          {/* <Button
-            color="error"
-            variant="contained"
-            startIcon={<Logout />}
-            onClick={handleLogout}
-            size="small"
-          >
-            로그아웃
-          </Button> */}
         </Toolbar>
       </AppBar>
 

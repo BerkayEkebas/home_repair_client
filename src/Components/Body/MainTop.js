@@ -136,6 +136,9 @@ const MainTop = () => {
   const [tabValue, setTabValue] = useState(0);
   const [language, setLanguage] = useState('korean'); // 'korean', 'english'
   const [anchorEl, setAnchorEl] = useState(null);
+  const [roomVacancy, setRoomVacancy] = useState();
+  const [lastUpdated, setLastUpdated] = useState();
+  const [timeLeft, setTimeLeft] = useState(0);
 
   // Dil çevirileri
   const translations = {
@@ -261,12 +264,87 @@ const MainTop = () => {
 
       const data = await response.json();
       setRoomData(Array.isArray(data) ? data : [data]);
+
+      const storedVacancy = localStorage.getItem("roomVacancy");
+      const currentVacancy = data[0].room_occupancy;
+
+      console.log("Önceki durum:", storedVacancy, "Şimdiki durum:", currentVacancy);
+
+      // Zaman hesaplaması
+      const currentTime = new Date().toISOString();
+      let timeToSet = currentTime;
+
+      if (storedVacancy === null || storedVacancy !== String(currentVacancy)) {
+        // Durum değişti, yeni zamanı kaydet
+        localStorage.setItem("vacancyStatusTime", currentTime);
+        console.log("Durum değişti, zaman güncellendi:", currentTime);
+      } else {
+        // Durum aynı, localStorage'daki zamanı kullan
+        timeToSet = localStorage.getItem("vacancyStatusTime") || currentTime;
+      }
+
+      // STATE'leri GÜNCELLE - önemli sıra!
+      setLastUpdated(timeToSet);
+      setRoomVacancy(currentVacancy);
+
+      // Zaman farkını hesapla ve state'e kaydet
+      const now = new Date();
+      const updated = new Date(timeToSet);
+      const diffMs = now - updated;
+      const diffMinutes = Math.floor(diffMs / 1000 / 60);
+      const remainingTime = Math.max(0, 30 - diffMinutes);
+
+      setTimeLeft(remainingTime);
+
+      // localStorage'ı güncelle
+      localStorage.setItem("roomVacancy", currentVacancy);
+
+      console.log("Güncel zaman:", timeToSet);
+      console.log("Zaman farkı (dakika):", diffMinutes);
+      console.log("Kalan süre:", remainingTime);
+
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message || t.error);
     } finally {
       setLoading(false);
     }
+  };
+  const formatTime = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+  const calculateTimeLeft = (lastUpdatedTime) => {
+    if (!lastUpdatedTime) {
+      console.log("calculateTimeLeft: lastUpdatedTime yok");
+      return 0;
+    }
+
+    const now = new Date();
+    const updated = new Date(lastUpdatedTime);
+
+    // Geçersiz tarih kontrolü
+    if (isNaN(updated.getTime())) {
+      console.log("calculateTimeLeft: geçersiz tarih");
+      return 0;
+    }
+
+    const diffMs = now - updated;
+    const diffMinutes = Math.floor(diffMs / 1000 / 60);
+    const timeLeft = Math.max(0, 30 - diffMinutes);
+
+    console.log("Hesaplanan zaman:", {
+      now: now.toISOString(),
+      updated: updated.toISOString(),
+      diffMs,
+      diffMinutes,
+      timeLeft
+    });
+
+    return timeLeft;
   };
 
   useEffect(() => {
@@ -367,10 +445,10 @@ const MainTop = () => {
   return (
     <Box sx={{ backgroundColor: "#0B1120", minHeight: "100vh", py: 4 }}>
       {/* Language Selector App Bar */}
-      <AppBar 
-        position="absolute" 
-        sx={{ 
-          backgroundColor: 'transparent', 
+      <AppBar
+        position="absolute"
+        sx={{
+          backgroundColor: 'transparent',
           boxShadow: 'none',
           top: 200,
           right: 16
@@ -402,13 +480,13 @@ const MainTop = () => {
               }
             }}
           >
-            <MenuItem 
+            <MenuItem
               onClick={() => handleLanguageChange('korean')}
               selected={language === 'korean'}
             >
               {t.korean}
             </MenuItem>
-            <MenuItem 
+            <MenuItem
               onClick={() => handleLanguageChange('english')}
               selected={language === 'english'}
             >
@@ -472,11 +550,11 @@ const MainTop = () => {
                             mb: 2
                           }}
                         />
-                        <PowerUsageBox sx={room.danger_status_ai === 1 ? {backgroundColor:"red"} : "" }>
-                          
+                        <PowerUsageBox sx={room.danger_status_ai === 1 ? { backgroundColor: "red" } : ""}>
+
                           <Typography variant="body1" sx={{ color: "#9ca3af" }}>
-                            {room.danger_status_ai === 1 && 
-                          <WarningAmber/>}
+                            {room.danger_status_ai === 1 &&
+                              <WarningAmber />}
                             {t.powerUsage}
                           </Typography>
                           <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
@@ -498,7 +576,7 @@ const MainTop = () => {
 
                         <Grid container spacing={1}>
                           <Grid item xs={6}>
-                            <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
+                            <StatusItem sx={room.danger_status_ai === 3 ? { backgroundColor: "red" } : ""}>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                                 {t.temperature}
                               </Typography>
@@ -508,7 +586,7 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
+                            <StatusItem sx={room.danger_status_ai === 2 ? { backgroundColor: "red" } : ""}>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                                 {t.ac}
                               </Typography>
@@ -524,7 +602,7 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem sx={room.danger_status_ai === 3 ? {backgroundColor:"red"} : "" }>
+                            <StatusItem sx={room.danger_status_ai === 3 ? { backgroundColor: "red" } : ""}>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                                 {t.humidity}
                               </Typography>
@@ -534,7 +612,7 @@ const MainTop = () => {
                             </StatusItem>
                           </Grid>
                           <Grid item xs={6}>
-                            <StatusItem sx={room.danger_status_ai === 2 ? {backgroundColor:"red"} : "" }>
+                            <StatusItem sx={room.danger_status_ai === 2 ? { backgroundColor: "red" } : ""}>
                               <Typography variant="body2" sx={{ color: "#9ca3af", fontWeight: "bold" }}>
                                 {t.window}
                               </Typography>
@@ -560,16 +638,27 @@ const MainTop = () => {
                           </Typography>
                         </Box>
 
-                        <VacancyTable sx={room.danger_status_ai === 4 ? {backgroundColor:"red"} : "" }>
+                        <VacancyTable sx={room.danger_status_ai === 4 ? { backgroundColor: "red" } : ""}>
                           <TableHeader>
                             <TableCell>{t.detect}</TableCell>
                             <TableCell>{t.timeLeft}</TableCell>
                             <TableCell>{t.power}</TableCell>
                           </TableHeader>
                           <TableRow>
-                            <TableCell>12:10</TableCell>
-                            <TableCell>20</TableCell>
-                            <TableCell sx={{ color: "#22c55e" }}>{t.on}</TableCell>
+                            <TableCell>
+                              {lastUpdated ? new Date(lastUpdated).toLocaleString() : "-"}
+                            </TableCell>
+                            <TableCell>
+                              {room.room_occupancy === "OCCUPIED"
+                                ? "-"  // Odada biri varsa "-" göster
+                                : timeLeft + "min" // Odada kimse yoksa geri sayım
+                              }
+                            </TableCell>
+                            <TableCell sx={{
+                              color: room.room_occupancy === "OCCUPIED" || timeLeft > 0 ? "#22c55e" : "gray"
+                            }}>
+                              {room.room_occupancy === "OCCUPIED" || timeLeft > 0 ? t.on : t.off}
+                            </TableCell>
                           </TableRow>
                         </VacancyTable>
                       </Box>
