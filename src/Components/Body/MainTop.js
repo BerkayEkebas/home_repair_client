@@ -239,9 +239,10 @@ const MainTop = () => {
       const userId = localStorage.getItem("user_id");
 
       if (!userId) {
-        setError(language === 'korean' 
-          ? "사용자 ID를 찾을 수 없습니다 (localStorage 비어있음)"
-          : "User ID not found (localStorage empty)"
+        setError(
+          language === "korean"
+            ? "사용자 ID를 찾을 수 없습니다 (localStorage 비어있음)"
+            : "User ID not found (localStorage empty)"
         );
         setLoading(false);
         return;
@@ -256,9 +257,7 @@ const MainTop = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
       setRoomData(Array.isArray(data) ? data : [data]);
@@ -269,6 +268,17 @@ const MainTop = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // İlk yüklemede çalıştır
+    fetchRoomStatus();
+    console.log("Updated")
+    // Her 1 dakikada bir tekrar çalıştır
+    const interval = setInterval(fetchRoomStatus, 30000);
+
+    // Bileşen kapandığında interval'i temizle
+    return () => clearInterval(interval);
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
